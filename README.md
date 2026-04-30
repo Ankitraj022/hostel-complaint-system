@@ -34,7 +34,7 @@ src/main/java/com/hostel/
 ## ⚙️ How to Run
 
 1. Clone the repository  
-git clone https://github.com/your-username/hostel-complaint-system.git  
+git clone https://github.com/Ankitraj022/hostel-complaint-system.git  
 
 2. Go to project folder  
 cd hostel-complaint-system  
