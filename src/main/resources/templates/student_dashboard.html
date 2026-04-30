@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Hostel System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .deco-shape-1 {
+            position: fixed;
+            top: -50px;
+            left: -50px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.3) 0%, rgba(0, 0, 0, 0) 70%);
+            z-index: -1;
+        }
+
+        .deco-shape-2 {
+            position: fixed;
+            bottom: -150px;
+            right: -150px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(0, 0, 0, 0) 70%);
+            z-index: -1;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        #sidebar {
+            min-width: 250px;
+            max-width: 250px;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(15px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            padding-top: 2rem;
+        }
+
+        #sidebar .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        #sidebar .sidebar-header .avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ec4899, #a855f7);
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        #sidebar ul li a {
+            padding: 15px 25px;
+            font-size: 1.1rem;
+            display: block;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        #sidebar ul li a:hover,
+        #sidebar ul li.active a {
+            background: rgba(236, 72, 153, 0.2);
+            color: #ec4899;
+            border-right: 4px solid #ec4899;
+        }
+
+        #sidebar ul li a i {
+            margin-right: 15px;
+        }
+
+        #content {
+            width: 100%;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .glass-card-hover:hover {
+            transform: translateY(-5px);
+            transition: transform 0.3s ease;
+        }
+
+        .table-glass {
+            color: #f8fafc;
+        }
+
+        .table-glass th {
+            background: transparent;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .table-glass td {
+            background: transparent;
+            border-color: rgba(255, 255, 255, 0.05);
+            vertical-align: middle;
+            padding: 1rem 0.5rem;
+            color: #f8fafc;
+        }
+
+        .form-control,
+        .form-select {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background: rgba(15, 23, 42, 0.9);
+            border-color: #ec4899;
+            color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(236, 72, 153, 0.25);
+        }
+
+        .form-control::placeholder {
+            color: #94a3b8;
+        }
+
+        option {
+            background: #1e293b;
+            color: #fff;
+        }
+
+        .btn-pink {
+            background: linear-gradient(135deg, #ec4899, #a855f7);
+            border: none;
+            color: #fff;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: transform 0.3s;
+        }
+
+        .btn-pink:hover {
+            transform: scale(1.05);
+            color: #fff;
+        }
+
+        .badge-pending {
+            background: #eab308;
+            color: #1e293b;
+        }
+
+        .badge-assigned {
+            background: #06b6d4;
+            color: #fff;
+        }
+
+        .badge-progress {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .badge-resolved {
+            background: #22c55e;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="deco-shape-1"></div>
+    <div class="deco-shape-2"></div>
+
+    <div class="wrapper">
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <div class="avatar" th:text="${#strings.substring(user.name, 0, 1)}">S</div>
+                <h5 class="text-white mb-0" th:text="${user.name}">Student Name</h5>
+                <small class="text-white-50" style="color: #cbd5e1 !important;">Standard Access</small>
+            </div>
+            <ul class="list-unstyled">
+                <li class="active"><a href="#complaints"><i class="bi bi-journal-text"></i> My Complaints</a></li>
+                <li><a href="#resources"><i class="bi bi-box-seam"></i> Request Assets</a></li>
+                <li class="mt-4">
+                    <form th:action="@{/logout}" method="post" class="px-4">
+                        <button type="submit" class="btn btn-outline-danger w-100 rounded-pill text-white"><i
+                                class="bi bi-box-arrow-left"></i> Logout</button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+
+        <div id="content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-white">Welcome <span th:text="${#strings.arraySplit(user.name, ' ')[0]}"></span>!</h2>
+                <button type="button" class="btn btn-pink px-4" data-bs-toggle="modal" data-bs-target="#complaintModal">
+                    <i class="bi bi-plus-lg"></i> New Complaint
+                </button>
+            </div>
+
+            <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show text-white"
+                role="alert" style="background: rgba(34, 197, 94, 0.4); border: 1px solid #4ade80;">
+                Complaint submitted successfully! We aim to resolve it quickly.
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${param.reqSuccess}" class="alert alert-success alert-dismissible fade show text-white"
+                role="alert" style="background: rgba(34, 197, 94, 0.4); border: 1px solid #4ade80;">
+                Resource request logged! Waiting for Admin approval.
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="row">
+                <div class="col-12" id="complaints">
+                    <div class="glass-card glass-card-hover">
+                        <h4 class="mb-4 text-white"><i class="bi bi-clock-history"></i> Complaint Tracking History</h4>
+                        <div class="table-responsive">
+                            <table class="table table-glass table-borderless table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>TID</th>
+                                        <th>Title</th>
+                                        <th>Category</th>
+                                        <th>Room</th>
+                                        <th>Status Updates</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${#lists.isEmpty(complaints)}">
+                                        <td colspan="5" class="text-center text-muted py-4">No complaints history found.
+                                        </td>
+                                    </tr>
+                                    <tr th:each="comp : ${complaints}">
+                                        <td style="color: #cbd5e1;" th:text="'#'+${comp.id}"></td>
+                                        <td><strong class="text-white" th:text="${comp.title}"></strong><br><small
+                                                style="color: #cbd5e1;" th:text="${comp.description}"></small></td>
+                                        <td><span class="badge bg-secondary rounded-pill text-white"
+                                                th:text="${comp.category}"></span></td>
+                                        <td class="text-white" th:text="${comp.roomNumber}"></td>
+                                        <td><span class="badge w-100 py-2"
+                                                th:classappend="${comp.status == 'Pending' ? 'badge-pending' : (comp.status == 'Resolved' ? 'badge-resolved' : 'badge-progress')}"
+                                                th:text="${comp.status}"></span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-5" id="resources">
+                    <div class="glass-card">
+                        <h4 class="mb-4 text-white"><i class="bi bi-cart-plus"></i> Request New Resource</h4>
+                        <form th:action="@{/student/resources/request}" method="post">
+                            <div class="mb-4">
+                                <label class="form-label text-white fw-bold">Select Resource to Request</label>
+                                <select name="resourceId" id="resourceId" class="form-select text-white"
+                                    onchange="toggleCustomResource()" required>
+                                    <option value="" disabled selected>-- Choose an item --</option>
+                                    <option th:each="res : ${resources}" th:value="${res.id}"
+                                        th:text="${res.name} + ' (' + ${res.quantity} + ' left)'"
+                                        th:disabled="${res.quantity == 0}"></option>
+                                    <option value="-1">Other (Type Custom Item)</option>
+                                </select>
+                                <div id="customResourceContainer" style="display:none; margin-top: 15px;">
+                                    <label class="form-label text-white fw-bold">Describe Custom Resource</label>
+                                    <input type="text" name="customResource" id="customResource"
+                                        class="form-control text-white" placeholder="E.g., Extra Blanket">
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label text-white fw-bold">Quantity Required</label>
+                                <input type="number" name="quantity" class="form-control text-white" min="1" max="5"
+                                    value="1" required>
+                            </div>
+                            <button type="submit" class="btn btn-pink w-100 py-2 fs-5">Submit Request</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="glass-card">
+                        <h4 class="mb-4 text-white">My Requests Ledger</h4>
+                        <div class="table-responsive">
+                            <table class="table table-glass table-borderless">
+                                <thead>
+                                    <tr>
+                                        <th>Item Requested</th>
+                                        <th>Quantity</th>
+                                        <th>Admin Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${#lists.isEmpty(myRequests)}">
+                                        <td colspan="3" class="text-center text-muted">No resource requests.</td>
+                                    </tr>
+                                    <tr th:each="req : ${myRequests}">
+                                        <td class="text-white fw-bold" th:text="${req.resource.name}"></td>
+                                        <td class="text-white" th:text="${req.requestedQuantity}"></td>
+                                        <td>
+                                            <span class="badge py-2 w-100"
+                                                th:classappend="${req.status == 'Approved' ? 'bg-success' : (req.status == 'Pending' ? 'bg-warning text-dark' : 'bg-danger')}"
+                                                th:text="${req.status}"></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Complaint Modal -->
+    <div class="modal fade" id="complaintModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content"
+                style="background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 15px;">
+                <div class="modal-header border-bottom-0">
+                    <h5 class="modal-title font-weight-bold">Lodge a New Complaint</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form th:action="@{/student/complaints}" th:object="${newComplaint}" method="post">
+
+                        <div class="mb-3">
+                            <label class="form-label text-white fw-bold">Complaint Title</label>
+                            <input type="text" th:field="*{title}" class="form-control text-white"
+                                placeholder="E.g., Broken Tap leaking water" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label text-white fw-bold">Category Sector</label>
+                                <select th:field="*{category}" class="form-select text-white" required>
+                                    <option value="" disabled selected>-- Choose Category --</option>
+                                    <option value="Plumbing">Plumbing</option>
+                                    <option value="Electricity">Electricity</option>
+                                    <option value="WiFi">WiFi / Network</option>
+                                    <option value="Carpentry">Carpentry</option>
+                                    <option value="Cleanliness">Cleanliness</option>
+                                    <option value="Mess">Mess / Food</option>
+                                </select>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label text-white fw-bold">Your Room / Location</label>
+                                <input type="text" th:field="*{roomNumber}" class="form-control text-white"
+                                    placeholder="E.g., 101-A or Corridor" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label text-white fw-bold">Detailed Description</label>
+                            <textarea th:field="*{description}" class="form-control text-white" rows="4"
+                                placeholder="Provide extra details for the staff to easily spot the problem..."
+                                required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-pink w-100 py-2 fs-5">Raise Ticket</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleCustomResource() {
+            const select = document.getElementById("resourceId");
+            const container = document.getElementById("customResourceContainer");
+            const input = document.getElementById("customResource");
+            if (select.value === "-1") {
+                container.style.display = "block";
+                input.required = true;
+            } else {
+                container.style.display = "none";
+                input.required = false;
+            }
+        }
+    </script>
+</body>
+
+</html>

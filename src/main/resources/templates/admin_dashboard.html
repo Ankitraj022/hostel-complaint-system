@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Hostel System</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .deco-shape-1 {
+            position: fixed;
+            top: -100px;
+            right: -100px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, rgba(0, 0, 0, 0) 70%);
+            z-index: -1;
+        }
+
+        .deco-shape-2 {
+            position: fixed;
+            bottom: -200px;
+            left: -100px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.3) 0%, rgba(0, 0, 0, 0) 70%);
+            z-index: -1;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        #sidebar {
+            min-width: 250px;
+            max-width: 250px;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(15px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            padding-top: 2rem;
+        }
+
+        #sidebar .sidebar-header {
+            padding: 20px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        #sidebar ul li a {
+            padding: 15px 25px;
+            font-size: 1.1rem;
+            display: block;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: 0.3s;
+            font-weight: 400;
+        }
+
+        #sidebar ul li a:hover,
+        #sidebar ul li.active a {
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            border-right: 4px solid #38bdf8;
+        }
+
+        #sidebar ul li a i {
+            margin-right: 15px;
+        }
+
+        #content {
+            width: 100%;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-card .icon-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .icon-blue {
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+        }
+
+        .icon-green {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .icon-yellow {
+            background: rgba(234, 179, 8, 0.2);
+            color: #eab308;
+        }
+
+        .table-glass {
+            color: #f8fafc;
+        }
+
+        .table-glass th {
+            background: transparent;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .table-glass td {
+            background: transparent;
+            border-color: rgba(255, 255, 255, 0.05);
+            vertical-align: middle;
+            padding: 1rem 0.5rem;
+            color: #fff;
+        }
+
+        .form-select,
+        .form-control {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #38bdf8;
+            color: #fff;
+            border-radius: 8px;
+        }
+
+        .form-select:focus,
+        .form-control:focus {
+            background: rgba(15, 23, 42, 0.9);
+            border-color: #38bdf8;
+            color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(56, 189, 248, 0.25);
+        }
+
+        option {
+            background: #1e293b;
+            color: #fff;
+        }
+
+        .badge-pending {
+            background: #eab308;
+            color: #1e293b;
+        }
+
+        .badge-assigned {
+            background: #06b6d4;
+            color: #fff;
+        }
+
+        .badge-progress {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .badge-resolved {
+            background: #22c55e;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="deco-shape-1"></div>
+    <div class="deco-shape-2"></div>
+
+    <div class="wrapper">
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <i class="bi bi-shield-lock-fill text-info"></i><br>Hostel Admin
+            </div>
+            <ul class="list-unstyled components">
+                <li class="active"><a href="#dashboard"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
+                <li><a href="#complaints"><i class="bi bi-inboxes"></i> Complaints</a></li>
+                <li><a href="#resources"><i class="bi bi-boxes"></i> Resources</a></li>
+                <li class="mt-4">
+                    <form th:action="@{/logout}" method="post" class="px-4">
+                        <button type="submit" class="btn btn-outline-danger w-100 rounded-pill text-white"><i
+                                class="bi bi-box-arrow-left"></i> Logout</button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+
+        <div id="content">
+            <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show text-white"
+                role="alert" style="background: rgba(34, 197, 94, 0.4); border: 1px solid #4ade80;">
+                Staff Assignment Updated!
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"
+                    aria-label="Close"></button>
+            </div>
+            <div th:if="${param.resSuccess}" class="alert alert-success alert-dismissible fade show text-white"
+                role="alert" style="background: rgba(34, 197, 94, 0.4); border: 1px solid #4ade80;">
+                Resource Request Processed!
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"
+                    aria-label="Close"></button>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-white fw-bold">Admin Overview</h2>
+                <div style="color: #cbd5e1;"><i class="bi bi-calendar3"></i> System Command Center</div>
+            </div>
+
+            <!-- Stats Widgets -->
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <div class="glass-card stat-card">
+                        <div>
+                            <h6 class="mb-1" style="color: #cbd5e1;">Total Complaints</h6>
+                            <h2 class="mb-0 fw-bold text-white" th:text="${#lists.size(complaints)}">0</h2>
+                        </div>
+                        <div class="icon-box icon-blue"><i class="bi bi-folder2-open"></i></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="glass-card stat-card">
+                        <div>
+                            <h6 class="mb-1" style="color: #cbd5e1;">Resolved Items</h6>
+                            <h2 class="mb-0 fw-bold" style="color: #4ade80;"
+                                th:text="${complaints.?[status == 'Resolved'].size()}">0</h2>
+                        </div>
+                        <div class="icon-box icon-green"><i class="bi bi-check-circle"></i></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="glass-card stat-card">
+                        <div>
+                            <h6 class="mb-1" style="color: #cbd5e1;">Active Asset Requests</h6>
+                            <h2 class="mb-0 fw-bold text-warning"
+                                th:text="${resourceRequests.?[status == 'Pending'].size()}">0</h2>
+                        </div>
+                        <div class="icon-box icon-yellow"><i class="bi bi-cart"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="glass-card" id="complaints">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="mb-0 text-white fw-bold">Needs Staff Assignment (Pending)</h5>
+                            <span class="badge bg-danger rounded-pill px-3 py-2">Critical Action Required</span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-glass table-borderless text-white">
+                                <thead>
+                                    <tr>
+                                        <th>Issue Trace</th>
+                                        <th>Student</th>
+                                        <th>Room #</th>
+                                        <th>Assign Form</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="comp : ${complaints}" th:if="${comp.status == 'Pending'}">
+                                        <td>
+                                            <strong class="text-white fs-5" th:text="${comp.title}"></strong><br>
+                                            <small style="color: #6ee7b7;" class="fw-bold text-uppercase"
+                                                th:text="${comp.category}"></small>
+                                        </td>
+                                        <td class="text-white" th:text="${comp.student.name}"></td>
+                                        <td class="text-white fw-bold" th:text="${comp.roomNumber}"></td>
+                                        <td>
+                                            <form th:action="@{/admin/complaints/{id}/assign(id=${comp.id})}"
+                                                method="post">
+                                                <div class="d-flex flex-column gap-2">
+                                                    <label class="form-label text-info fw-bold mb-0"
+                                                        style="font-size: 0.8rem;">Select Staff</label>
+                                                    <div class="d-flex gap-2">
+                                                        <select name="staffId"
+                                                            class="form-select form-select-sm text-white"
+                                                            style="min-width: 140px; border: 1px solid #38bdf8;"
+                                                            required>
+                                                            <option value="" disabled selected>-- Choose Staff --
+                                                            </option>
+                                                            <option th:each="staff : ${staffMembers}"
+                                                                th:value="${staff.id}" th:text="${staff.name}"></option>
+                                                        </select>
+                                                        <button type="submit"
+                                                            class="btn btn-sm btn-info text-dark fw-bold">Delegate</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${complaints.?[status == 'Pending'].isEmpty()}">
+                                        <td colspan="4" class="text-center text-muted">All incoming complaints have been
+                                            assigned!</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="glass-card">
+                        <h5 class="mb-4 text-white">System Status Graph</h5>
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-2">
+                <div class="col-lg-6">
+                    <div class="glass-card" id="resources">
+                        <h5 class="mb-4 text-white fw-bold">Pending Resource Approvals</h5>
+                        <div class="table-responsive">
+                            <table class="table table-glass table-borderless text-white">
+                                <thead>
+                                    <tr>
+                                        <th>Item Tag</th>
+                                        <th>Qty</th>
+                                        <th>Student Name</th>
+                                        <th>Decision Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="req : ${resourceRequests}"
+                                        th:if="${req.status == 'Pending' || req.status == 'New Request'}">
+                                        <td class="text-white fw-bold fs-6" th:text="${req.resource.name}"></td>
+                                        <td class="text-white" th:text="${req.requestedQuantity}"></td>
+                                        <td class="text-info font-weight-bold" th:text="${req.student.name}"></td>
+                                        <td class="d-flex gap-2">
+                                            <form th:action="@{/admin/resources/request/{id}/process(id=${req.id})}"
+                                                method="post">
+                                                <input type="hidden" name="status" value="Approved">
+                                                <button type="submit"
+                                                    class="btn btn-sm btn-success px-3">Approve</button>
+                                            </form>
+                                            <form th:action="@{/admin/resources/request/{id}/process(id=${req.id})}"
+                                                method="post">
+                                                <input type="hidden" name="status" value="Rejected">
+                                                <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger px-3">Deny</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <tr
+                                        th:if="${resourceRequests.?[status == 'Pending' || status == 'New Request'].isEmpty()}">
+                                        <td colspan="4" class="text-center text-muted">No pending resource requests.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="glass-card">
+                        <h5 class="mb-4 text-white fw-bold">System Global Inventory</h5>
+                        <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                            <table class="table table-glass table-hover table-borderless mb-0 text-white">
+                                <thead>
+                                    <tr>
+                                        <th>Item Title</th>
+                                        <th>Stock Amount</th>
+                                        <th>Available Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="res : ${resources}">
+                                        <td class="text-white fw-bold" th:text="${res.name}"></td>
+                                        <td class="fw-bold fs-5 text-center" th:text="${res.quantity}"></td>
+                                        <td><span class="badge rounded-pill fs-6 px-3"
+                                                th:classappend="${res.status == 'Available' ? 'bg-success' : (res.status == 'Low Stock' ? 'bg-warning text-dark' : 'bg-danger')}"
+                                                th:text="${res.status}"></span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card mt-3">
+                <h5 class="mb-4 text-white fw-bold">Resolved & Active Track</h5>
+                <div class="table-responsive">
+                    <table class="table table-glass table-borderless text-white">
+                        <thead>
+                            <tr>
+                                <th>Log ID</th>
+                                <th>Issue Reported</th>
+                                <th>Field Staff Deployed</th>
+                                <th>Resolution Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="comp : ${complaints}" th:if="${comp.status != 'Pending'}">
+                                <td style="color: #cbd5e1" th:text="'#'+${comp.id}"></td>
+                                <td class="text-white fw-bold" th:text="${comp.title}"></td>
+                                <td class="text-info fw-bold"
+                                    th:text="${comp.staff != null ? comp.staff.name : 'Unassigned'}"></td>
+                                <td><span class="badge py-2 w-100 fs-6"
+                                        th:classappend="${comp.status == 'Resolved' ? 'bg-success' : (comp.status == 'Assigned' ? 'bg-info text-dark' : 'bg-primary')}"
+                                        th:text="${comp.status}"></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const cResolved = /*[[${complaints.?[status == 'Resolved'].size()}]]*/ 0;
+        const cPending = /*[[${complaints.?[status == 'Pending'].size()}]]*/ 0;
+        const cProgress = /*[[${complaints.?[status == 'In Progress'].size()}]]*/ 0;
+        const cAssigned = /*[[${complaints.?[status == 'Assigned'].size()}]]*/ 0;
+        /*]]>*/
+
+        const ctx = document.getElementById('statusChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Resolved', 'Pending', 'In Progress', 'Assigned'],
+                datasets: [{
+                    data: [cResolved, cPending, cProgress, cAssigned],
+                    backgroundColor: ['#4ade80', '#eab308', '#3b82f6', '#06b6d4'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: { cutout: '70%', plugins: { legend: { position: 'bottom', labels: { color: '#ffffff', font: { family: 'Outfit', size: 14 } } } } }
+        });
+    </script>
+</body>
+
+</html>
